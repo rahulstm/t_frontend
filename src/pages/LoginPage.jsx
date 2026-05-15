@@ -15,8 +15,8 @@ export default function LoginPage() {
     try {
       await login(email, password)
       navigate('/')
-    } catch {
-      setError('Could not log in. Check your email and password.')
+    } catch (err) {
+      setError(err.userMessage || 'Could not log in. Check your email and password.')
     }
   }
 

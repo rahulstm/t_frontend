@@ -16,8 +16,8 @@ export default function SignupPage() {
     try {
       await signup(name, email, password)
       navigate('/')
-    } catch {
-      setError('Could not create your account. The email may already be in use.')
+    } catch (err) {
+      setError(err.userMessage || 'Could not create your account.')
     }
   }
 

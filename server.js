@@ -6,8 +6,10 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = Number(process.env.PORT) || 8080
 const HOST = '0.0.0.0'
-const API_TARGET =
+// Host only — no /api suffix. Proxy forwards /api/* → ${API_TARGET}/api/*
+const API_TARGET = (
   process.env.API_TARGET || 'https://taskbackend-oiuia.ondigitalocean.app'
+).replace(/\/$/, '')
 
 const app = express()
 
