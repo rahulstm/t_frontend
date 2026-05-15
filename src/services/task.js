@@ -1,4 +1,5 @@
 import api from './api.js'
+import { endpoints } from './endpoints.js'
 import { normalizeTask } from './project.js'
 
 const priorityMap = {
@@ -14,7 +15,7 @@ const statusMap = {
 }
 
 export async function fetchDashboardOverview() {
-  const response = await api.get('/projects/stats/overview')
+  const response = await api.get(endpoints.projects.statsOverview)
   const { stats, tasks, tasksByUser } = response.data
   return {
     stats,
@@ -31,7 +32,7 @@ export async function createTask(projectId, payload) {
     priority: priorityMap[payload.priority] || 'medium',
     assignedTo: payload.assigneeId || null,
   }
-  const response = await api.post(`/projects/${projectId}/tasks`, body)
+  const response = await api.post(endpoints.projects.tasks(projectId), body)
   return normalizeTask(response.data.task)
 }
 
@@ -44,10 +45,10 @@ export async function updateTask(taskId, payload) {
   if (payload.dueDate !== undefined) body.dueDate = payload.dueDate || null
   if (payload.assigneeId !== undefined) body.assignedTo = payload.assigneeId || null
 
-  const response = await api.put(`/projects/tasks/${taskId}`, body)
+  const response = await api.put(endpoints.tasks.update(taskId), body)
   return normalizeTask(response.data.task)
 }
 
 export async function deleteTask(taskId) {
-  await api.delete(`/projects/tasks/${taskId}`)
+  await api.delete(endpoints.tasks.delete(taskId))
 }

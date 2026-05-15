@@ -28,7 +28,7 @@ export default function DashboardPage() {
         setRecentTasks(overview.tasks.slice(0, 6))
       } catch {
         if (!cancelled) {
-          setError('Could not load the dashboard. Start the API on port 5000 or check your connection.')
+          setError('Could not load the dashboard. Check that the backend API is reachable.')
         }
       } finally {
         if (!cancelled) setLoading(false)

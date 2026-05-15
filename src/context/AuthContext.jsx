@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { login as loginRequest, signup as signupRequest } from '../services/auth.js'
+import {
+  getProfile,
+  login as loginRequest,
+  signup as signupRequest,
+} from '../services/auth.js'
 import { AuthContext } from './auth-context.js'
 
 const STORAGE_TOKEN = 'task_manager_token'
@@ -12,6 +16,7 @@ export function AuthProvider({ children }) {
   })
   const [token, setToken] = useState(() => localStorage.getItem(STORAGE_TOKEN))
   const [loading, setLoading] = useState(false)
+  const [initializing, setInitializing] = useState(() => !!localStorage.getItem(STORAGE_TOKEN))
 
   useEffect(() => {
     if (token) localStorage.setItem(STORAGE_TOKEN, token)
@@ -22,6 +27,32 @@ export function AuthProvider({ children }) {
     if (user) localStorage.setItem(STORAGE_USER, JSON.stringify(user))
     else localStorage.removeItem(STORAGE_USER)
   }, [user])
+
+  useEffect(() => {
+    if (!localStorage.getItem(STORAGE_TOKEN)) return
+
+    let cancelled = false
+    async function hydrateSession() {
+      try {
+        const response = await getProfile()
+        if (cancelled) return
+        setToken(response.token)
+        setUser(response.user)
+      } catch {
+        if (!cancelled) {
+          setToken(null)
+          setUser(null)
+        }
+      } finally {
+        if (!cancelled) setInitializing(false)
+      }
+    }
+
+    hydrateSession()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const login = async (email, password) => {
     setLoading(true)
@@ -51,8 +82,8 @@ export function AuthProvider({ children }) {
   }
 
   const value = useMemo(
-    () => ({ user, token, loading, login, signup, logout }),
-    [user, token, loading],
+    () => ({ user, token, loading: loading || initializing, login, signup, logout }),
+    [user, token, loading, initializing],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -1,4 +1,5 @@
 import api from './api.js'
+import { endpoints } from './endpoints.js'
 
 const normalizeRole = (role) => (role === 'admin' ? 'Admin' : 'Member')
 
@@ -21,7 +22,7 @@ const normalizeAuthResponse = (data) => ({
 })
 
 export async function login(email, password) {
-  const response = await api.post('/auth/login', { email, password })
+  const response = await api.post(endpoints.auth.login, { email, password })
   return normalizeAuthResponse(response.data)
 }
 
@@ -30,7 +31,7 @@ export async function signup(name, email, password) {
   const space = trimmed.indexOf(' ')
   const firstName = space === -1 ? trimmed : trimmed.slice(0, space)
   const lastName = space === -1 ? '' : trimmed.slice(space + 1).trim()
-  const response = await api.post('/auth/signup', {
+  const response = await api.post(endpoints.auth.signup, {
     firstName,
     lastName,
     email,
@@ -40,6 +41,6 @@ export async function signup(name, email, password) {
 }
 
 export async function getProfile() {
-  const response = await api.get('/auth/profile')
+  const response = await api.get(endpoints.auth.profile)
   return normalizeAuthResponse(response.data)
 }

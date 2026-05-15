@@ -17,7 +17,7 @@ export default function ProjectsPage() {
         const list = await fetchProjects()
         if (!cancelled) setProjects(list)
       } catch {
-        if (!cancelled) setError('Could not load projects. Is the backend running on port 5000?')
+        if (!cancelled) setError('Could not load projects. Check that the backend API is reachable.')
       }
     }
     load()

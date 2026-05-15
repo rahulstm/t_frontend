@@ -1,4 +1,5 @@
 import api from './api.js'
+import { endpoints } from './endpoints.js'
 
 const normalizeRole = (role) => (role === 'admin' ? 'Admin' : 'Member')
 
@@ -60,40 +61,40 @@ const normalizeProject = (project) => ({
 })
 
 export async function fetchProjects() {
-  const response = await api.get('/projects')
+  const response = await api.get(endpoints.projects.list)
   return response.data.projects.map(normalizeProject)
 }
 
 export async function fetchProject(projectId) {
-  const response = await api.get(`/projects/${projectId}`)
+  const response = await api.get(endpoints.projects.detail(projectId))
   return normalizeProject(response.data.project)
 }
 
 export async function createProject(payload) {
-  const response = await api.post('/projects', payload)
+  const response = await api.post(endpoints.projects.create, payload)
   return normalizeProject(response.data.project)
 }
 
 export async function updateProject(projectId, payload) {
-  const response = await api.put(`/projects/${projectId}`, payload)
+  const response = await api.put(endpoints.projects.update(projectId), payload)
   return normalizeProject(response.data.project)
 }
 
 export async function deleteProject(projectId) {
-  await api.delete(`/projects/${projectId}`)
+  await api.delete(endpoints.projects.delete(projectId))
 }
 
 export async function addProjectMember(projectId, body) {
-  await api.post(`/projects/${projectId}/members`, body)
+  await api.post(endpoints.projects.members(projectId), body)
   return fetchProject(projectId)
 }
 
 export async function removeProjectMember(projectId, userId) {
-  await api.delete(`/projects/${projectId}/members/${userId}`)
+  await api.delete(endpoints.projects.member(projectId, userId))
   return fetchProject(projectId)
 }
 
 export async function fetchProjectTasks(projectId) {
-  const response = await api.get(`/projects/${projectId}/tasks`)
+  const response = await api.get(endpoints.projects.tasks(projectId))
   return response.data.tasks.map(normalizeTask)
 }
